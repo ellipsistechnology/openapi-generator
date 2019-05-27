@@ -1,5 +1,14 @@
 'use strict';
 
+import {autowiredBlackboxService} from 'blackbox-ioc'
+
+class {{baseName}}ServiceWrapper {
+  @autowiredBlackboxService('{{classVarName}}')
+  service: any
+}
+const {{classVarName}}Wrapper = new {{baseName}}ServiceWrapper()
+console.log({{classVarName}}Wrapper.service);
+
 {{#operations}}
 {{#operation}}
 
@@ -21,9 +30,14 @@
  * returns {{{returnType}}}
 {{/returnType}}
  **/
-exports.{{{operationId}}} = function({{#allParams}}{{paramName}}{{#hasMore}},{{/hasMore}}{{/allParams}}) {
+exports.{{{operationId}}} = function({{#allParams}}{{paramName}}:any{{#hasMore}},{{/hasMore}}{{/allParams}}) {
   return new Promise(function(resolve, reject) {
-  {{#returnType}}
+    // Call service provider for {{{operationId}}}:
+    // TODO: ioc
+
+    // Return value:
+    {{#returnType}}
+    /* TODO: Allow for examples when using OPTIONS or
     var examples = {};
     {{#examples}}
     examples['{{contentType}}'] = {{{example}}};
@@ -33,6 +47,7 @@ exports.{{{operationId}}} = function({{#allParams}}{{paramName}}{{#hasMore}},{{/
     } else {
       resolve();
     }
+    */
     {{/returnType}}
     {{^returnType}}
     resolve();

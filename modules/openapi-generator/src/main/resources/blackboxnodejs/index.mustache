@@ -1,9 +1,12 @@
 /*
  * Blackbox API for {{blackboxApiName}}
- * 
+ *
  */
 
 'use strict';
+
+var test = require('blackbox-ioc');
+console.log(test);
 
 var fs = require('fs'),
     path = require('path'),
@@ -17,7 +20,7 @@ var serverPort = {{serverPort}};
 // swaggerRouter configuration
 var options = {
   swaggerUi: path.join(__dirname, '/openapi.json'),
-  controllers: path.join(__dirname, './controllers'),
+  controllers: path.join(__dirname, './gensrc/controllers'),
   useStubs: process.env.NODE_ENV === 'development' // Conditionally turn on stubs (mock mode)
 };
 
@@ -26,7 +29,7 @@ var spec = fs.readFileSync(path.join(__dirname,'api/openapi.yaml'), 'utf8');
 var swaggerDoc = jsyaml.safeLoad(spec);
 
 // Initialize the Swagger middleware
-oas3Tools.initializeMiddleware(swaggerDoc, function (middleware) {
+oas3Tools.initializeMiddleware(swaggerDoc, function (middleware:any) {
 
   // Interpret Swagger resources and attach metadata to request - must be first in swagger-tools middleware chain
   app.use(middleware.swaggerMetadata());

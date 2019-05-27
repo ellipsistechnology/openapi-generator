@@ -42,8 +42,9 @@ import static org.openapitools.codegen.utils.StringUtils.*;
 
 public class BlackboxNodeJSServerCodegen extends DefaultCodegen implements CodegenConfig {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BlackboxNodeJSServerCodegen.class);
-    protected String implFolder = "service";
+    private static final String SRC_DIR = "gensrc";
+	private static final Logger LOGGER = LoggerFactory.getLogger(BlackboxNodeJSServerCodegen.class);
+    protected String implFolder = SRC_DIR+File.separator+"service";
     public static final String GOOGLE_CLOUD_FUNCTIONS = "googleCloudFunctions";
     public static final String EXPORTED_NAME = "exportedName";
     public static final String SERVER_PORT = "serverPort";
@@ -76,7 +77,7 @@ public class BlackboxNodeJSServerCodegen extends DefaultCodegen implements Codeg
          */
         apiTemplateFiles.put(
                 "controller.mustache",   // the template to use
-                ".js");       // the extension for each file to write
+                ".ts");       // the extension for each file to write
 
         /*
          * Template Location.  This is the location which templates will be read from.  The generator
@@ -103,8 +104,9 @@ public class BlackboxNodeJSServerCodegen extends DefaultCodegen implements Codeg
         additionalProperties.put("apiVersion", apiVersion);
         additionalProperties.put("implFolder", implFolder);
         // TODO load name from blackbox.json
+        // TODO only overwrite existing files in gensrc - all others should be skipped if present
 
-        supportingFiles.add(new SupportingFile("writer.mustache", ("utils").replace(".", File.separator), "writer.js"));
+        supportingFiles.add(new SupportingFile("writer.mustache", SRC_DIR+File.separator+"utils", "writer.ts"));
 
         cliOptions.add(CliOption.newBoolean(GOOGLE_CLOUD_FUNCTIONS,
                 "When specified, it will generate the code which runs within Google Cloud Functions "
@@ -121,7 +123,7 @@ public class BlackboxNodeJSServerCodegen extends DefaultCodegen implements Codeg
 
     @Override
     public String apiPackage() {
-        return "controllers";
+        return SRC_DIR+File.separator+"controllers";
     }
 
     /**
@@ -177,8 +179,8 @@ public class BlackboxNodeJSServerCodegen extends DefaultCodegen implements Codeg
         String result = super.apiFilename(templateName, tag);
 
         if (templateName.equals("service.mustache")) {
-            String stringToMatch = File.separator + "controllers" + File.separator;
-            String replacement = File.separator + implFolder + File.separator;
+            String stringToMatch = SRC_DIR+File.separator+"controllers" + File.separator;
+            String replacement = implFolder + File.separator;
             result = result.replaceAll(Pattern.quote(stringToMatch), replacement);
         }
         return result;
@@ -300,18 +302,6 @@ public class BlackboxNodeJSServerCodegen extends DefaultCodegen implements Codeg
     public void processOpts() {
         super.processOpts();
 
-        StringBuilder message = new StringBuilder();
-        message.append(System.lineSeparator()).append(System.lineSeparator())
-                .append("=======================================================================================")
-                .append(System.lineSeparator())
-                .append("Currently, Node.js server doesn't work as its dependency doesn't support OpenAPI Spec3.")
-                .append(System.lineSeparator())
-                .append("For further details, see https://github.com/OpenAPITools/openapi-generator/issues/34")
-                .append(System.lineSeparator())
-                .append("=======================================================================================")
-                .append(System.lineSeparator()).append(System.lineSeparator());
-        LOGGER.warn(message.toString());
-
         if (additionalProperties.containsKey(GOOGLE_CLOUD_FUNCTIONS)) {
             setGoogleCloudFunctions(
                     Boolean.valueOf(additionalProperties.get(GOOGLE_CLOUD_FUNCTIONS).toString()));
@@ -335,16 +325,17 @@ public class BlackboxNodeJSServerCodegen extends DefaultCodegen implements Codeg
                 "openapi.yaml")
         );
         if (getGoogleCloudFunctions()) {
-            writeOptional(outputFolder, new SupportingFile("index-gcf.mustache", "", "index.js"));
+            writeOptional(outputFolder, new SupportingFile("index-gcf.mustache", "", "index.ts"));
         } else {
-            writeOptional(outputFolder, new SupportingFile("index.mustache", "", "index.js"));
+            writeOptional(outputFolder, new SupportingFile("index.mustache", "", "index.ts"));
         }
         writeOptional(outputFolder, new SupportingFile("package.mustache", "", "package.json"));
+        writeOptional(outputFolder, new SupportingFile("tsconfig.mustache", "", "tsconfig.json"));
         writeOptional(outputFolder, new SupportingFile("README.mustache", "", "README.md"));
         if (GeneratorProperties.getProperty("noservice") == null) {
             apiTemplateFiles.put(
                     "service.mustache",   // the template to use
-                    "Service.js");       // the extension for each file to write
+                    "Service.ts");       // the extension for each file to write
         }
     }
 

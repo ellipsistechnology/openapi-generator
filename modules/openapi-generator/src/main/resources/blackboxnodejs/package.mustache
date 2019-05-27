@@ -6,19 +6,23 @@
   {{^googleCloudFunctions}}
   "scripts": {
     "prestart": "npm install",
-    "start": "node index.js"
+    "start": "node dist/index.js",
+    "build": "tsc -p ."
   },
   {{/googleCloudFunctions}}
   "keywords": [
     "openapi-tools"
   ],
-  "license": "Unlicense",
+  "license": "ISC",
   "private": true,
   "dependencies": {
   {{^googleCloudFunctions}}
     "connect": "^3.2.0",
   {{/googleCloudFunctions}}
     "js-yaml": "^3.3.0",
-    "oas3-tools": "^1.0.1"
+    "oas3-tools": "^1.0.1",
+    "@types/node": "^12.0.0",
+    "typescript": "^3.4.5",
+    "blackbox-ioc": "git+https://ellipsistechnology:hCvSq2EWLqeF3Rva3T5T@bitbucket.org/ellipsistechnology/blackbox-ioc-js.git"
   }
 }
