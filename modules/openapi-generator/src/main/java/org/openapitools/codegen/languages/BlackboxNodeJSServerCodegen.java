@@ -321,7 +321,7 @@ public class BlackboxNodeJSServerCodegen extends DefaultCodegen implements Codeg
         //   "controller.js")
         // );
         supportingFiles.add(new SupportingFile("openapi.mustache",
-                "api",
+                SRC_DIR+File.separator+"api",
                 "openapi.yaml")
         );
         if (getGoogleCloudFunctions()) {
@@ -331,6 +331,7 @@ public class BlackboxNodeJSServerCodegen extends DefaultCodegen implements Codeg
         }
         writeOptional(outputFolder, new SupportingFile("package.mustache", "", "package.json"));
         writeOptional(outputFolder, new SupportingFile("tsconfig.mustache", "", "tsconfig.json"));
+        writeOptional(outputFolder, new SupportingFile("gulpfile.mustache", "", "gulpfile.js"));
         writeOptional(outputFolder, new SupportingFile("README.mustache", "", "README.md"));
         if (GeneratorProperties.getProperty("noservice") == null) {
             apiTemplateFiles.put(

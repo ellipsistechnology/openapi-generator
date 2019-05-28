@@ -7,6 +7,7 @@ class {{baseName}}ServiceWrapper {
   service: any
 }
 const {{classVarName}}Wrapper = new {{baseName}}ServiceWrapper()
+console.log("{{classVarName}}Wrapper.service:")
 console.log({{classVarName}}Wrapper.service);
 
 {{#operations}}
@@ -33,7 +34,12 @@ console.log({{classVarName}}Wrapper.service);
 exports.{{{operationId}}} = function({{#allParams}}{{paramName}}:any{{#hasMore}},{{/hasMore}}{{/allParams}}) {
   return new Promise(function(resolve, reject) {
     // Call service provider for {{{operationId}}}:
-    // TODO: ioc
+    try {
+      resolve({{classVarName}}Wrapper.service.{{{operationId}}}({{#allParams}}{{paramName}}{{#hasMore}},{{/hasMore}}{{/allParams}}))
+    }
+    catch(err) {
+      reject(err)
+    }
 
     // Return value:
     {{#returnType}}

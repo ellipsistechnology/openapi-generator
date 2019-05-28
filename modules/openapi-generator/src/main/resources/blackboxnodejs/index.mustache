@@ -5,12 +5,19 @@
 
 'use strict';
 
-var test = require('blackbox-ioc');
-console.log(test);
-
 var fs = require('fs'),
     path = require('path'),
-    http = require('http');
+    http = require('http'),
+    glob = require('glob'),
+    path = require('path');
+
+// Load all files to ensure annotations are read:
+glob
+  .sync(`${__dirname}/*src/**/*.js`)
+  .forEach( (file:string) => {
+    console.log(`${file} => ${path.resolve(file)}`);
+    require(path.resolve(file))
+  } )
 
 var app = require('connect')();
 var oas3Tools = require('oas3-tools');
