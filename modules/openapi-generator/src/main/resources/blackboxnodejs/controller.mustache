@@ -7,7 +7,12 @@ var {{classname}} = require('../service/{{classname}}Service');
 
 module.exports.{{nickname}} = function {{nickname}} (req:any, res:any, next:any) {
   {{#allParams}}
+  {{#isBodyParam}}
+  var {{paramName}} = req.body;
+  {{/isBodyParam}}
+  {{^isBodyParam}}
   var {{paramName}} = req.swagger.params['{{baseName}}'].value;
+  {{/isBodyParam}}
   {{/allParams}}
   {{classname}}.{{nickname}}({{#allParams}}{{paramName}}{{#hasMore}},{{/hasMore}}{{/allParams}})
     .then(function (response:any) {
