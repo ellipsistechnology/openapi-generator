@@ -7,8 +7,6 @@ class {{baseName}}ServiceWrapper {
   service: any
 }
 const {{classVarName}}Wrapper = new {{baseName}}ServiceWrapper()
-console.log("{{classVarName}}Wrapper.service:")
-console.log({{classVarName}}Wrapper.service);
 
 {{#operations}}
 {{#operation}}
@@ -38,7 +36,19 @@ exports.{{{operationId}}} = function({{#allParams}}{{paramName}}:any{{#hasMore}}
       resolve({{classVarName}}Wrapper.service.{{{operationId}}}({{#allParams}}{{paramName}}{{#hasMore}},{{/hasMore}}{{/allParams}}))
     }
     catch(err) {
-      reject(err)
+      console.error(err)
+      if(typeof err === 'string')
+        reject(err)
+
+      if(err instanceof Error)
+        reject({
+          error:{
+            name:err.name,
+            description:err.message
+          }
+        })
+      else
+        reject({error:err})
     }
 
     // Return value:
