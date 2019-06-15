@@ -5,11 +5,18 @@
 
 'use strict';
 
+import {factory} from 'blackbox-ioc'
+import {defaultRuleBase} from 'blackbox-rules-utils'
+import RuleBase from 'blackbox-rules'
+
 var fs = require('fs'),
     path = require('path'),
     http = require('http'),
     glob = require('glob'),
     path = require('path');
+
+import initRulesService from 'blackbox-rules-service'
+initRulesService()
 
 // Load all files to ensure annotations are read:
 glob
@@ -17,6 +24,13 @@ glob
   .forEach( (file:string) => {
     require(path.resolve(file))
   } )
+
+class RuleBaseFactory {
+  @factory('rulebase')
+  createRuleBase():RuleBase {
+    return defaultRuleBase()
+  }
+}
 
 var app = require('connect')();
 var oas3Tools = require('oas3-tools');
