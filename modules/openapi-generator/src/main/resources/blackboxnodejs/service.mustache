@@ -1,6 +1,7 @@
 'use strict';
 
 import {autowiredService} from 'blackbox-ioc'
+import { trimToDepth, verboseResponse } from 'blackbox-services';
 
 class {{baseName}}ServiceWrapper {
   @autowiredService('{{classVarName}}-service')
@@ -33,10 +34,18 @@ exports.{{{operationId}}} = function({{#allParams}}{{paramName}}:any{{#hasMore}}
   return new Promise(function(resolve, reject) {
     // Call service provider for {{{operationId}}}:
     try {
-      resolve({{classVarName}}Wrapper.service.{{{operationId}}}({
+      let val = {{classVarName}}Wrapper.service.{{{operationId}}}({
         {{#allParams}}{{paramName}}:{{paramName}}{{#hasMore}},
         {{/hasMore}}{{/allParams}}
-      }))
+      })
+
+      {{#vendorExtensions.verbose}}
+      val = verboseResponse(val, verbose)
+      {{/vendorExtensions.verbose}}
+      {{#vendorExtensions.depth}}
+      val = trimToDepth(val, depth)
+      {{/vendorExtensions.depth}}
+      resolve(val)
     }
     catch(err) {
       console.error(err)

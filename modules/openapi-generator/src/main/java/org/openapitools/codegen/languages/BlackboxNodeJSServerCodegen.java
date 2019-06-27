@@ -229,6 +229,7 @@ public class BlackboxNodeJSServerCodegen extends DefaultCodegen implements Codeg
         exportedName = name;
     }
 
+    // TODO Add depth & verbose as Booleans for use with trimToDepth. 
     @Override
     public Map<String, Object> postProcessOperationsWithModels(Map<String, Object> objs, List<Object> allModels) {
         @SuppressWarnings("unchecked")
@@ -237,6 +238,16 @@ public class BlackboxNodeJSServerCodegen extends DefaultCodegen implements Codeg
         List<CodegenOperation> operations = (List<CodegenOperation>) objectMap.get("operation");
         for (CodegenOperation operation : operations) {
             operation.httpMethod = operation.httpMethod.toLowerCase(Locale.ROOT);
+            
+            // Add hierarchy to operation.vendorExtensions:
+            for (CodegenParameter param : operation.queryParams) {
+				if("depth".equals(param.baseName)) {
+					operation.vendorExtensions.put("depth", true);
+				}
+				if("verbose".equals(param.baseName)) {
+					operation.vendorExtensions.put("verbose", true);
+				}
+			}
 
             List<CodegenParameter> params = operation.allParams;
             if (params != null && params.size() == 0) {
