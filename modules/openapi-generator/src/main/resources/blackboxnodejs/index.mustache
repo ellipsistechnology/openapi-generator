@@ -6,7 +6,7 @@
 'use strict';
 
 import {factory} from 'blackbox-ioc'
-import {defaultRuleBase} from 'blackbox-rules-utils'
+import {DefaultRuleBase} from 'blackbox-rules-utils'
 import RuleBase from 'blackbox-rules'
 
 var fs = require('fs'),
@@ -28,7 +28,7 @@ glob
 class RuleBaseFactory {
   @factory('rulebase')
   createRuleBase():RuleBase {
-    return defaultRuleBase()
+    return new DefaultRuleBase()
   }
 }
 
