@@ -13,10 +13,11 @@ var fs = require('fs'),
     path = require('path'),
     http = require('http'),
     glob = require('glob'),
-    path = require('path');
-
-import initRulesService from 'blackbox-rules-service'
-initRulesService()
+    path = require('path'),
+    app = require('connect')(),
+    oas3Tools = require('oas3-tools'),
+    jsyaml = require('js-yaml'),
+    serverPort = {{serverPort}};
 
 // Load all files to ensure annotations are read:
 glob
@@ -25,17 +26,27 @@ glob
     require(path.resolve(file))
   } )
 
-class RuleBaseFactory {
+// The Swagger document (require it, build it programmatically, fetch it from a URL, ...)
+var spec = fs.readFileSync(path.join(__dirname,'api/openapi.yaml'), 'utf8');
+var swaggerDoc = jsyaml.safeLoad(spec);
+
+class _InitIoc {
   @factory('rulebase')
   createRuleBase():RuleBase {
     return new DefaultRuleBase()
   }
+
+  @factory('oasDoc')
+  getOasDoc() {
+    return swaggerDoc
+  }
 }
 
-var app = require('connect')();
-var oas3Tools = require('oas3-tools');
-var jsyaml = require('js-yaml');
-var serverPort = {{serverPort}};
+import initRulesService from 'blackbox-rules-service'
+initRulesService()
+
+import initRootServices from 'blackbox-root-service'
+initRootServices()
 
 // swaggerRouter configuration
 var options = {
@@ -43,10 +54,6 @@ var options = {
   controllers: path.join(__dirname, './gensrc/controllers'),
   useStubs: process.env.NODE_ENV === 'development' // Conditionally turn on stubs (mock mode)
 };
-
-// The Swagger document (require it, build it programmatically, fetch it from a URL, ...)
-var spec = fs.readFileSync(path.join(__dirname,'api/openapi.yaml'), 'utf8');
-var swaggerDoc = jsyaml.safeLoad(spec);
 
 // Initialize the Swagger middleware
 oas3Tools.initializeMiddleware(swaggerDoc, function (middleware:any) {
