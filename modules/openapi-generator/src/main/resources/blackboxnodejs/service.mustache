@@ -30,57 +30,54 @@ const {{classVarName}}Wrapper = new {{baseName}}ServiceWrapper()
  * returns {{{returnType}}}
 {{/returnType}}
  **/
-exports.{{{operationId}}} = function({{#allParams}}{{paramName}}:any{{#hasMore}},{{/hasMore}}{{/allParams}}) {
-  return new Promise(function(resolve, reject) {
+exports.{{{operationId}}} = async function({{#allParams}}{{paramName}}:any{{#hasMore}},{{/hasMore}}{{/allParams}}) {
+  try {
     // Call service provider for {{{operationId}}}:
-    try {
-      let val = {{classVarName}}Wrapper.service.{{{operationId}}}({
-        {{#allParams}}{{paramName}}:{{paramName}}{{#hasMore}},
-        {{/hasMore}}{{/allParams}}
-      })
+    let val = await Promise.resolve({{classVarName}}Wrapper.service.{{{operationId}}}({
+      {{#allParams}}{{paramName}}:{{paramName}}{{#hasMore}},
+      {{/hasMore}}{{/allParams}}
+    }))
 
-      {{#vendorExtensions.verbose}}
-      val = verboseResponse(val, verbose)
-      {{/vendorExtensions.verbose}}
-      {{#vendorExtensions.depth}}
-      val = trimToDepth(val, depth)
-      {{/vendorExtensions.depth}}
-      resolve(val)
-    }
-    catch(err) {
-      console.error(err)
-      if(typeof err === 'string')
-        reject(err)
+    {{#vendorExtensions.verbose}}
+    val = verboseResponse(val, verbose)
+    {{/vendorExtensions.verbose}}
+    {{#vendorExtensions.depth}}
+    val = trimToDepth(val, depth)
+    {{/vendorExtensions.depth}}
+    return val
+  }
+  catch(err) {
+    console.error(err)
+    if(typeof err === 'string')
+      return err
 
-      if(err instanceof Error)
-        reject({
-          error:{
-            name:err.name,
-            description:err.message
-          }
-        })
-      else
-        reject({error:err})
-    }
+    if(err instanceof Error)
+      return {
+        error:{
+          name:err.name,
+          description:err.message
+        }
+      }
+    else
+      return {
+        error:err
+      }
+  }
 
-    // Return value:
-    {{#returnType}}
-    /* TODO: Allow for examples when using OPTIONS or
-    var examples = {};
-    {{#examples}}
-    examples['{{contentType}}'] = {{{example}}};
-    {{/examples}}
-    if (Object.keys(examples).length > 0) {
-      resolve(examples[Object.keys(examples)[0]]);
-    } else {
-      resolve();
-    }
-    */
-    {{/returnType}}
-    {{^returnType}}
+  // Return value:
+  {{#returnType}}
+  /* TODO: Allow for examples when using OPTIONS or
+  var examples = {};
+  {{#examples}}
+  examples['{{contentType}}'] = {{{example}}};
+  {{/examples}}
+  if (Object.keys(examples).length > 0) {
+    resolve(examples[Object.keys(examples)[0]]);
+  } else {
     resolve();
-    {{/returnType}}
-  });
+  }
+  */
+  {{/returnType}}
 }
 
 {{/operation}}
