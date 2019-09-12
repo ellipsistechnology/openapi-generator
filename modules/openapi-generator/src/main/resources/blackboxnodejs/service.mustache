@@ -9,6 +9,15 @@ class {{baseName}}ServiceWrapper {
 }
 const {{classVarName}}Wrapper = new {{baseName}}ServiceWrapper()
 
+function strip__(target: any) {
+  const ret:any = {}
+  Object.keys(target).forEach(key => {
+    if(!key.startsWith('__'))
+      ret[key] = target[key]
+  })
+  return ret
+}
+
 {{#operations}}
 {{#operation}}
 
@@ -44,7 +53,7 @@ exports.{{{operationId}}} = async function({{#allParams}}{{paramName}}:any{{#has
     {{#vendorExtensions.depth}}
     val = trimToDepth(val, depth)
     {{/vendorExtensions.depth}}
-    return val
+    return strip__(val)
   }
   catch(err) {
     console.error(err)
