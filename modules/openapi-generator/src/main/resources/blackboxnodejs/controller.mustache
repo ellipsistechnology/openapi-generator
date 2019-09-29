@@ -19,7 +19,7 @@ module.exports.{{nickname}} = function {{nickname}} (req:any, res:any, next:any)
       utils.writeJson(res, response);
     })
     .catch(function (response:any) {
-      utils.writeJson(res, response);
+      next(response);
     });
 };
 {{/operation}}
