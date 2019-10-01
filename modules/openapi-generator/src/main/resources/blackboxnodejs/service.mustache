@@ -9,13 +9,17 @@ class {{baseName}}ServiceWrapper {
 }
 const {{classVarName}}Wrapper = new {{baseName}}ServiceWrapper()
 
-function strip__(target: any) {
-  const ret:any = {}
-  Object.keys(target).forEach(key => {
-    if(!key.startsWith('__'))
-      ret[key] = target[key]
-  })
-  return ret
+function strip__(target: any): any {
+  if(Array.isArray(target)) {
+    return target.map(strip__)
+  } else {
+    const ret:any = {}
+    Object.keys(target).forEach(key => {
+      if(!key.startsWith('__'))
+        ret[key] = target[key]
+    })
+    return ret
+  }
 }
 
 function convertBooleanParameter(val:any):boolean {
