@@ -44,7 +44,6 @@ public class BlackboxNodeJSServerCodegen extends DefaultCodegen implements Codeg
 
     private static final String SRC_DIR = "gensrc";
 	private static final Logger LOGGER = LoggerFactory.getLogger(BlackboxNodeJSServerCodegen.class);
-    protected String implFolder = SRC_DIR+File.separator+"service";
     public static final String GOOGLE_CLOUD_FUNCTIONS = "googleCloudFunctions";
     public static final String EXPORTED_NAME = "exportedName";
     public static final String SERVER_PORT = "serverPort";
@@ -102,7 +101,6 @@ public class BlackboxNodeJSServerCodegen extends DefaultCodegen implements Codeg
          * are available in models, apis, and supporting files
          */
         additionalProperties.put("apiVersion", apiVersion);
-        additionalProperties.put("implFolder", implFolder);
         // TODO load name from blackbox.json
         // TODO only overwrite existing files in gensrc - all others should be skipped if present
 
@@ -156,8 +154,7 @@ public class BlackboxNodeJSServerCodegen extends DefaultCodegen implements Codeg
      */
     @Override
     public String getHelp() {
-        return "Generates a nodejs server library using the swagger-tools project.  By default, " +
-                "it will also generate service classes--which you can disable with the `-Dnoservice` environment variable.";
+        return "Generates a nodejs server library using the swagger-tools project.";
     }
 
     @Override
@@ -177,12 +174,6 @@ public class BlackboxNodeJSServerCodegen extends DefaultCodegen implements Codeg
     @Override
     public String apiFilename(String templateName, String tag) {
         String result = super.apiFilename(templateName, tag);
-
-        if (templateName.equals("service.mustache")) {
-            String stringToMatch = SRC_DIR+File.separator+"controllers" + File.separator;
-            String replacement = implFolder + File.separator;
-            result = result.replaceAll(Pattern.quote(stringToMatch), replacement);
-        }
         return result;
     }
 
@@ -344,11 +335,6 @@ public class BlackboxNodeJSServerCodegen extends DefaultCodegen implements Codeg
         writeOptional(outputFolder, new SupportingFile("tsconfig.mustache", "", "tsconfig.json"));
         writeOptional(outputFolder, new SupportingFile("gulpfile.mustache", "", "gulpfile.js"));
         writeOptional(outputFolder, new SupportingFile("README.mustache", "", "README.md"));
-        if (GeneratorProperties.getProperty("noservice") == null) {
-            apiTemplateFiles.put(
-                    "service.mustache",   // the template to use
-                    "Service.ts");       // the extension for each file to write
-        }
     }
 
     @Override
