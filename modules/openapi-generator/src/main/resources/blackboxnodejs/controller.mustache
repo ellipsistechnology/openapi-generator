@@ -1,9 +1,39 @@
 'use strict';
 
 var utils = require('../utils/writer.js');
-{{#operations}}
-var {{classname}} = require('../service/{{classname}}Service');
-{{#operation}}
+import { autowiredService } from 'blackbox-ioc'
+import { trimToDepth, verboseResponse } from 'blackbox-services';
+
+class {{baseName}}ServiceWrapper {
+  @autowiredService('{{classVarName}}-service')
+  service: any
+}
+const {{classVarName}}Wrapper = new {{baseName}}ServiceWrapper()
+
+function strip__(target: any): any {
+  if(Array.isArray(target)) {
+    return target.map(strip__)
+  } else {
+    const ret:any = {}
+    Object.keys(target).forEach(key => {
+      if(!key.startsWith('__'))
+        ret[key] = target[key]
+    })
+    return ret
+  }
+}
+
+function convertBooleanParameter(val:any):boolean {
+  if(val === 'false')
+       return false;
+  if(val === '')
+     return true;
+  return val
+}
+
+// {{#operations}}
+// var {{classname}} = require('../service/{{classname}}Service');
+// {{#operation}}
 
 module.exports.{{nickname}} = function {{nickname}} (req:any, res:any, next:any) {
   {{#allParams}}
@@ -14,13 +44,35 @@ module.exports.{{nickname}} = function {{nickname}} (req:any, res:any, next:any)
   var {{paramName}} = req.swagger.params['{{baseName}}'].value;
   {{/isBodyParam}}
   {{/allParams}}
-  {{classname}}.{{nickname}}({{#allParams}}{{paramName}}{{#hasMore}},{{/hasMore}}{{/allParams}})
-    .then(function (response:any) {
-      utils.writeJson(res, response);
+  {{#vendorExtensions.verbose}}
+  verbose = convertBooleanParameter(verbose)
+  {{/vendorExtensions.verbose}}
+
+  try {
+    Promise.resolve({{classVarName}}Wrapper.service.{{{operationId}}}({ req{{#allParams}}, {{paramName}}{{/allParams}} }))
+    .then((val: any) => {
+      {{#vendorExtensions.verbose}}
+      val = verboseResponse(val, verbose)
+      {{/vendorExtensions.verbose}}
+      {{#vendorExtensions.depth}}
+      val = trimToDepth(val, depth)
+      {{/vendorExtensions.depth}}
+      val = strip__(val)
+      utils.writeJson(res, val)
+    }).catch((err: any) => {
+      next(err);
     })
-    .catch(function (response:any) {
-      next(response);
-    });
+  } catch(err) {
+    next(err)
+  }
+
+  //{{classname}}.{{nickname}}({{#allParams}}{{paramName}}{{#hasMore}},{{/hasMore}}{{/allParams}})
+  //  .then(function (response:any) {
+  //    utils.writeJson(res, response);
+  //  })
+  //  .catch(function (response:any) {
+  //    next(response);
+  //  });
 };
 {{/operation}}
 {{/operations}}

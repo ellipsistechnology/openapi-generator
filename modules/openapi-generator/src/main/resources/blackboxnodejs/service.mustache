@@ -52,23 +52,25 @@ function convertBooleanParameter(val:any):boolean {
 {{/returnType}}
  **/
 exports.{{{operationId}}} = async function({{#allParams}}{{paramName}}:any{{#hasMore}},{{/hasMore}}{{/allParams}}) {
-  {{#vendorExtensions.verbose}}
-  verbose = convertBooleanParameter(verbose)
-  {{/vendorExtensions.verbose}}
+  throw new Error('{{{operationId}}}() should never be called!')
 
-  // Call service provider for {{{operationId}}}:
-  let val = await Promise.resolve({{classVarName}}Wrapper.service.{{{operationId}}}({
-    {{#allParams}}{{paramName}}:{{paramName}}{{#hasMore}},
-    {{/hasMore}}{{/allParams}}
-  }))
+  // {{#vendorExtensions.verbose}}
+  // verbose = convertBooleanParameter(verbose)
+  // {{/vendorExtensions.verbose}}
 
-  {{#vendorExtensions.verbose}}
-  val = verboseResponse(val, verbose)
-  {{/vendorExtensions.verbose}}
-  {{#vendorExtensions.depth}}
-  val = trimToDepth(val, depth)
-  {{/vendorExtensions.depth}}
-  return strip__(val)
+  // // Call service provider for {{{operationId}}}:
+  // let val = await Promise.resolve({{classVarName}}Wrapper.service.{{{operationId}}}({
+  //   {{#allParams}}{{paramName}}:{{paramName}}{{#hasMore}},
+  //   {{/hasMore}}{{/allParams}}
+  // }))
+
+  // {{#vendorExtensions.verbose}}
+  // val = verboseResponse(val, verbose)
+  // {{/vendorExtensions.verbose}}
+  // {{#vendorExtensions.depth}}
+  // val = trimToDepth(val, depth)
+  // {{/vendorExtensions.depth}}
+  // return strip__(val)
 
   // Return value:
   {{#returnType}}
